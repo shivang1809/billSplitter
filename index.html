@@ -1,0 +1,639 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SettleQuick - Smart Bill Splitter</title>
+    <meta name="description" content="Split dinner bills effortlessly with friends, calculate fair individual shares, adjust payer balances, share UPI QR codes, and export PDF summaries offline." />
+    <meta property="og:title" content="SettleQuick - Smart Bill Splitter" />
+    <meta property="og:description" content="Split dinner bills effortlessly with friends, calculate fair individual shares, adjust payer balances, share UPI QR codes, and export PDF summaries offline." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <!-- Animated Ambient Background Layer -->
+    <div class="ambient-background" aria-hidden="true">
+      <div class="mesh-grid"></div>
+      <div class="glow-orb orb-1"></div>
+      <div class="glow-orb orb-2"></div>
+      <div class="glow-orb orb-3"></div>
+      <div class="floating-shape shape-1">✦</div>
+      <div class="floating-shape shape-2">◆</div>
+      <div class="floating-shape shape-3">₹</div>
+      <div class="floating-shape shape-4">$</div>
+      <div class="floating-shape shape-5">★</div>
+    </div>
+
+    <!-- Application Wrapper -->
+    <div class="container">
+      <!-- Top Application Navigation -->
+      <header class="app-header">
+        <div class="brand-wrapper">
+          <div class="brand-icon-box" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+              <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+              <path d="M12 11h4"></path>
+              <path d="M12 16h4"></path>
+              <path d="M8 11h.01"></path>
+              <path d="M8 16h.01"></path>
+            </svg>
+          </div>
+          <div>
+            <h1 class="brand-title">SettleQuick</h1>
+            <p class="brand-tagline">Fair expense splitter &amp; settlement ledger</p>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <div id="onlineStatusBadge" class="status-badge" title="Network status">
+            <span class="pulse-dot"></span>
+            <span>100% Offline Ready</span>
+          </div>
+          <button type="button" id="btnSampleBill" class="btn-ghost" title="Load sample bill to test">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            <span>Try Sample</span>
+          </button>
+          <button type="button" id="btnResetBill" class="btn-ghost" title="Reset all fields">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path>
+              <path d="M21 3v5h-5"></path>
+              <path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path>
+              <path d="M3 21v-5h5"></path>
+            </svg>
+            <span>Reset</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- INTRO HERO SECTION (Hidden when in Step 2 to remove useless empty space) -->
+      <section class="hero-intro-section" id="heroIntroSection">
+        <div class="hero-badge-pill">
+          <span class="sparkle-icon">✨</span>
+          <span>Effortless Post-Dinner Settlements</span>
+        </div>
+        <h2 class="hero-heading">
+          Let's settle the bill together.
+        </h2>
+        <p class="hero-subtext">
+          No awkward math, no missing cents. Create your occasion, add your friends, adjust who already paid, and let everyone settle in seconds via UPI QR or PDF summary.
+        </p>
+
+        <!-- Feature Highlights Strip -->
+        <div class="hero-feature-strip">
+          <div class="feature-item">
+            <span class="feature-bullet">✓</span>
+            <span>Exact cent split math</span>
+          </div>
+          <div class="feature-item">
+            <span class="feature-bullet">✓</span>
+            <span>Locked host &amp; person-1, person-2 roster</span>
+          </div>
+          <div class="feature-item">
+            <span class="feature-bullet">✓</span>
+            <span>Host payment tracker &amp; Sticky notes</span>
+          </div>
+        </div>
+
+        <!-- CTA Button with Smooth Animation Scroll -->
+        <button type="button" id="btnGetStarted" class="btn-hero-cta">
+          <span>Create Event &amp; Settle Bill</span>
+          <svg class="cta-arrow-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <polyline points="19 12 12 19 5 12"></polyline>
+          </svg>
+        </button>
+      </section>
+
+      <!-- COMPACT EVENT BAR (Visible in Step 2 to eliminate empty space and show current event info) -->
+      <div id="eventCompactBar" class="event-compact-bar" style="display: none;">
+        <div class="compact-info-wrapper">
+          <span class="compact-badge">Active Event</span>
+          <span id="compactOccasionTitle" class="compact-title">Dinner with Friends</span>
+          <span class="compact-meta">
+            Host: <strong id="compactHostName">Alex</strong> &middot; Bill: <strong id="compactBillAmount">₹0.00</strong>
+          </span>
+        </div>
+        <button type="button" id="btnEditEventCompact" class="btn-compact-edit">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+          </svg>
+          <span>Edit Event</span>
+        </button>
+      </div>
+
+      <!-- PROGRESS STEPPER BAR -->
+      <nav class="stepper-bar" id="stepperNav" aria-label="Bill creation steps">
+        <button type="button" class="step-btn active" id="stepBtn1">
+          <span class="step-num">1</span>
+          <span class="step-label">Event &amp; Host</span>
+        </button>
+        <span class="step-connector"></span>
+        <button type="button" class="step-btn" id="stepBtn2">
+          <span class="step-num">2</span>
+          <span class="step-label">Friends Roster</span>
+        </button>
+        <span class="step-connector"></span>
+        <button type="button" class="step-btn" id="stepBtn3">
+          <span class="step-num">3</span>
+          <span class="step-label">Settlement Summary</span>
+        </button>
+      </nav>
+
+      <!-- MAIN APP INTERACTIVE WORKSPACE -->
+      <main class="layout-grid" id="eventCreationSection">
+        <!-- Interactive Multi-Step Form Container -->
+        <div class="step-flow-wrapper">
+          <!-- STEP 1 CARD: Event Creation & Host Name (Completely hidden once job is done) -->
+          <section class="card form-section step-card active" id="step1Card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">
+                  <span class="step-badge-tag">Step 1</span>
+                  <span>Create Event &amp; Enter Host</span>
+                </h2>
+                <p class="card-subtitle">Tell us what you're splitting and who is organizing the event</p>
+              </div>
+            </div>
+
+            <!-- Occasion Floating Field -->
+            <div class="form-group">
+              <div class="input-container">
+                <span class="input-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                  </svg>
+                </span>
+                <input type="text" id="occasionInput" class="floating-input" placeholder=" " value="Friday Dinner with Friends" autocomplete="off" />
+                <label for="occasionInput" class="floating-label">Event / Occasion Name (e.g. Dinner at Mario's)</label>
+              </div>
+              <span class="field-error-text" id="occasionErrorText">Please provide an event name</span>
+            </div>
+
+            <!-- Host Name Field (The First Person) -->
+            <div class="form-group">
+              <div class="input-container">
+                <span class="input-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="7" r="4"></circle>
+                    <path d="M5.5 21a6.5 6.5 0 0 1 13 0"></path>
+                  </svg>
+                </span>
+                <input type="text" id="hostNameInput" class="floating-input" placeholder=" " value="Alex" autocomplete="off" />
+                <label for="hostNameInput" class="floating-label">Your Name (Host - Cannot be removed)</label>
+              </div>
+              <span class="field-error-text" id="hostErrorText">Please enter your name as the host</span>
+            </div>
+
+            <!-- Bill Amount & Currency Row -->
+            <div class="form-row two-cols">
+              <div class="form-group">
+                <div class="input-container">
+                  <span class="input-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                      <line x1="2" y1="10" x2="22" y2="10"></line>
+                    </svg>
+                  </span>
+                  <input type="number" id="billAmountInput" class="floating-input" placeholder=" " min="1" step="any" required />
+                  <label for="billAmountInput" class="floating-label">Total Bill Amount</label>
+                </div>
+                <span class="field-error-text" id="billErrorText">Bill amount must be greater than 0</span>
+              </div>
+
+              <div class="currency-select-box">
+                <select id="currencySelect" class="currency-select" title="Select Currency">
+                  <option value="₹">₹ INR</option>
+                  <option value="$">$ USD</option>
+                  <option value="€">€ EUR</option>
+                  <option value="£">£ GBP</option>
+                  <option value="¥">¥ JPY</option>
+                  <option value="A$">A$ AUD</option>
+                  <option value="C$">C$ CAD</option>
+                  <option value="AED">AED</option>
+                </select>
+
+                <div class="tip-selector" style="flex: 1;">
+                  <span class="tip-label">Tip / Tax:</span>
+                  <div class="tip-options">
+                    <button type="button" class="tip-btn active" data-tip="0">0%</button>
+                    <button type="button" class="tip-btn" data-tip="5">5%</button>
+                    <button type="button" class="tip-btn" data-tip="10">10%</button>
+                    <button type="button" class="tip-btn" data-tip="15">15%</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Continue to Step 2 Button with Animation -->
+            <button type="button" id="btnProceedToFriends" class="btn-calculate" style="margin-top: 1.25rem;">
+              <span>Continue to Friends List</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </button>
+          </section>
+
+          <!-- STEP 2 CARD: User List with Host Locked & person-1, person-2... -->
+          <section class="card form-section step-card" id="step2Card">
+            <div class="card-header">
+              <div>
+                <button type="button" id="btnBackToEvent" class="btn-back-step" title="Back to edit event">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                  </svg>
+                  <span>Edit Event &amp; Bill</span>
+                </button>
+                <h2 class="card-title" style="margin-top: 0.5rem;">
+                  <span class="step-badge-tag">Step 2</span>
+                  <span>Friends List &amp; Settlement</span>
+                </h2>
+                <p class="card-subtitle">
+                  The host is permanently locked. Add or remove friends (<span class="code-pill">person-1</span>, <span class="code-pill">person-2</span>, ...).
+                </p>
+              </div>
+            </div>
+
+            <!-- Group Members Section -->
+            <div class="people-section" style="border-top: none; padding-top: 0; margin-top: 0;">
+              <div class="people-controls-bar">
+                <div>
+                  <span class="card-title" style="font-size: 0.95rem;">Group Members</span>
+                  <span id="peopleCountText" class="people-count-pill">3 people</span>
+                </div>
+                <button type="button" id="btnAddPerson" class="btn-add-person" title="Add another person">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                  <span>Add Person</span>
+                </button>
+              </div>
+
+              <!-- Dynamic List of People (Host locked, friends person-1, person-2...) -->
+              <div id="peopleList" class="people-list"></div>
+            </div>
+
+            <!-- Who Paid Section (Payer Adjustment) -->
+            <div class="payer-selection-box">
+              <div class="payer-header">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 14 14"></polyline>
+                </svg>
+                <span>Who already paid the bill?</span>
+              </div>
+              <select id="payerSelect" class="payer-dropdown" title="Select who paid the bill"></select>
+              <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.4rem;">
+                Balances automatically calculate net debts so the payer is reimbursed exactly.
+              </p>
+            </div>
+
+            <!-- Optional UPI QR Code Section -->
+            <div class="upi-section">
+              <div class="upi-section-title">
+                <span>UPI Payment QR Code</span>
+                <span class="optional-tag">Optional</span>
+              </div>
+              <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+                Upload your UPI QR or type your UPI ID so friends can scan and pay you immediately.
+              </p>
+
+              <div class="upi-upload-zone" id="upiDropZone">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                <div class="upi-upload-text">
+                  <strong>Upload UPI QR Image</strong> or click to browse
+                </div>
+                <input type="file" id="upiQrUploadInput" accept="image/*" title="Upload UPI QR" />
+              </div>
+
+              <!-- QR Preview if uploaded -->
+              <div id="qrPreviewBox" class="qr-preview-box">
+                <img id="qrPreviewImg" src="" alt="Uploaded QR Code" class="qr-preview-thumb" />
+                <div class="qr-preview-info">
+                  <strong>UPI QR Code Attached</strong>
+                  <span>Ready to be scanned in final summary</span>
+                </div>
+                <button type="button" id="btnRemoveQr" class="btn-remove-qr">Remove</button>
+              </div>
+
+              <div class="upi-id-row">
+                <input type="text" id="upiIdInput" class="upi-id-input" placeholder="Or enter UPI ID (e.g. name@okhdfcbank)" autocomplete="off" />
+              </div>
+            </div>
+
+            <!-- Calculate Action Button -->
+            <button type="button" id="btnCalculate" class="btn-calculate">
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+              </svg>
+              <span>Split Bill &amp; Show Shares</span>
+            </button>
+
+            <!-- Error Alert Banner -->
+            <div id="errorBanner" class="error-banner" role="alert">
+              <div class="error-banner-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="8" x2="12" y2="12"></line>
+                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+              </div>
+              <div>
+                <div class="error-banner-title">Calculation Notice</div>
+                <div id="errorBannerDesc" class="error-banner-desc">
+                  Please enter a valid bill amount greater than 0 and at least 1 person.
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- RESULTS SECTION -->
+        <section class="results-wrapper">
+          <!-- Empty State Placeholder -->
+          <div id="emptyPlaceholder" class="empty-placeholder">
+            <div class="empty-icon-circle">
+              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+              </svg>
+            </div>
+            <h3 class="empty-title">Ready to Settle Up</h3>
+            <p class="empty-desc">
+              Complete your event details and click <strong>Split Bill &amp; Show Shares</strong> to generate per-person amounts, payer balances, and settlement ledger.
+            </p>
+          </div>
+
+          <!-- Active Results Card -->
+          <div id="resultsCard" class="card results-card">
+            <!-- Summary Highlights -->
+            <div class="summary-highlight">
+              <div id="resOccasion" class="summary-occasion">Dinner with Friends</div>
+              <div class="summary-figures-grid">
+                <div>
+                  <div class="stat-label">Total Amount</div>
+                  <div id="resTotalAmount" class="stat-value">₹0.00</div>
+                </div>
+                <div>
+                  <div class="stat-label">Per-Person Share</div>
+                  <div id="resPerPerson" class="stat-value highlight-green">₹0.00</div>
+                </div>
+              </div>
+              <div id="exactMatchText" class="exact-match-badge">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+                <span>Shares add up exactly to the total bill</span>
+              </div>
+            </div>
+
+            <!-- Individual Member Breakdown -->
+            <div class="card-header" style="margin-bottom: 0.75rem;">
+              <h3 class="card-title" style="font-size: 0.95rem;">Individual Shares</h3>
+            </div>
+            <div id="sharesList" class="shares-list"></div>
+
+            <!-- Settlement Transfers Ledger -->
+            <div class="settlement-ledger">
+              <div class="settlement-title">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="17 1 21 5 17 9"></polyline>
+                  <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+                  <polyline points="7 23 3 19 7 15"></polyline>
+                  <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+                </svg>
+                <span>Settlement Ledger (Who Pays Whom)</span>
+              </div>
+              <div id="transfersList" class="transfers-list"></div>
+            </div>
+
+            <!-- NEW: Host Payment Tracker (Visible ONLY after bill is split) -->
+            <div id="hostPaymentTrackerCard" class="host-tracker-box">
+              <div class="tracker-header">
+                <div class="tracker-title-wrap">
+                  <span class="tracker-crown">👑</span>
+                  <div>
+                    <h4 class="tracker-title">Host Payment Tracker</h4>
+                    <p class="tracker-subtitle">Mark friends who have transferred their share to you</p>
+                  </div>
+                </div>
+                <div id="trackerProgressBadge" class="tracker-progress-badge">0 / 0 Paid</div>
+              </div>
+
+              <!-- Animated Progress Bar -->
+              <div class="tracker-progress-track">
+                <div id="trackerProgressBar" class="tracker-progress-fill" style="width: 0%;"></div>
+              </div>
+
+              <!-- Interactive Debtor Checkoff List -->
+              <div id="trackerDebtorsList" class="tracker-debtors-list"></div>
+            </div>
+
+            <!-- Scannable UPI Settlement Section -->
+            <div id="upiResultCard" class="upi-result-card">
+              <h4 id="upiResultPayee" style="font-size: 0.95rem; font-weight: 700; color: #ffffff;">Pay via UPI</h4>
+              <div class="upi-qr-display-frame" id="upiResultQrBox"></div>
+              <div class="upi-details-row">
+                <span id="upiResultIdText"></span>
+                <button type="button" id="btnCopyUpi" class="copy-upi-btn" title="Copy UPI ID">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                  </svg>
+                  <span>Copy</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Export & Share Actions -->
+            <div class="results-action-bar">
+              <button type="button" id="btnExportPdf" class="btn-export-pdf" title="Download offline PDF document">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span>Export PDF Summary</span>
+              </button>
+
+              <button type="button" id="btnPrintView" class="btn-print-view" title="Print or save as PDF via system dialog">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                  <rect x="6" y="14" width="12" height="8"></rect>
+                </svg>
+                <span>Print / Save PDF</span>
+              </button>
+
+              <button type="button" id="btnCopyText" class="btn-copy-text" title="Copy formatted text for WhatsApp or Messages">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                <span>Copy Summary for WhatsApp / Group Chat</span>
+              </button>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <!-- NEW: STICKY NOTE BOARD SECTION (Event Memories & Reviews with Offline JPG Export) -->
+      <section class="sticky-board-section" id="stickyBoardSection">
+        <div class="sticky-board-header">
+          <div class="sticky-header-left">
+            <span class="board-badge-pill">📌 Memory &amp; Review Corkboard</span>
+            <h3 class="board-title">Event Memory Sticky Notes</h3>
+            <p class="board-subtitle">
+              Select who is typing, post your experience or review, and download the entire board as a souvenir JPG image!
+            </p>
+          </div>
+          <!-- Multi-Platform Share Buttons -->
+          <div class="share-buttons-group">
+            <span class="share-group-label">Share Event:</span>
+            <button type="button" id="btnShareWhatsApp" class="share-btn share-btn-wa" title="Share via WhatsApp">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.669-.699c.969.586 1.761.884 2.791.884 3.179 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.87-5.768-6.07zm3.447 8.163c-.145.408-.847.765-1.196.792-.34.027-.775.14-2.529-.587-2.109-.874-3.442-3.04-3.547-3.18-.105-.141-.856-1.139-.856-2.172 0-1.033.542-1.542.735-1.752.193-.21.421-.263.562-.263.141 0 .281.002.404.009.129.007.303-.049.474.362.177.427.604 1.472.656 1.579.052.107.087.233.016.375-.071.142-.107.23-.213.354-.106.124-.223.277-.318.372-.106.105-.217.22-.093.432.124.212.551.908 1.181 1.469.81.721 1.493.944 1.706 1.05.213.106.338.089.463-.054.125-.143.535-.623.678-.835.143-.213.286-.178.481-.106.195.071 1.238.584 1.45.69.213.106.355.159.408.25.053.091.053.531-.092.939z"></path>
+              </svg>
+              <span>WhatsApp</span>
+            </button>
+            <button type="button" id="btnShareTelegram" class="share-btn share-btn-tg" title="Share via Telegram">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"></path>
+              </svg>
+              <span>Telegram</span>
+            </button>
+            <button type="button" id="btnShareTwitter" class="share-btn share-btn-x" title="Share via X / Twitter">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path>
+              </svg>
+              <span>X (Twitter)</span>
+            </button>
+            <button type="button" id="btnShareNative" class="share-btn share-btn-copy" title="Copy shareable link & summary">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              <span>Copy Link</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Sticky Note Creator Form -->
+        <div class="sticky-creator-card">
+          <div class="creator-row">
+            <div class="creator-author-box">
+              <label for="stickyAuthorSelect" class="creator-label">Who is typing?</label>
+              <select id="stickyAuthorSelect" class="creator-select" title="Select who is writing this note"></select>
+            </div>
+
+            <div class="creator-color-box">
+              <span class="creator-label">Sticky Color:</span>
+              <div class="sticky-color-palette" id="stickyColorPalette">
+                <button type="button" class="color-swatch active" data-color="#fef08a" style="background: #fef08a;" title="Sunny Yellow"></button>
+                <button type="button" class="color-swatch" data-color="#fbcfe8" style="background: #fbcfe8;" title="Pastel Rose"></button>
+                <button type="button" class="color-swatch" data-color="#bbf7d0" style="background: #bbf7d0;" title="Mint Green"></button>
+                <button type="button" class="color-swatch" data-color="#bae6fd" style="background: #bae6fd;" title="Sky Blue"></button>
+                <button type="button" class="color-swatch" data-color="#e9d5ff" style="background: #e9d5ff;" title="Lavender"></button>
+              </div>
+            </div>
+
+            <div class="creator-mood-box">
+              <span class="creator-label">Vibe:</span>
+              <div class="sticky-mood-palette" id="stickyMoodPalette">
+                <button type="button" class="mood-btn active" data-mood="😋">😋</button>
+                <button type="button" class="mood-btn" data-mood="🎉">🎉</button>
+                <button type="button" class="mood-btn" data-mood="🍕">🍕</button>
+                <button type="button" class="mood-btn" data-mood="☕">☕</button>
+                <button type="button" class="mood-btn" data-mood="😂">😂</button>
+                <button type="button" class="mood-btn" data-mood="❤️">❤️</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="creator-text-box">
+            <textarea id="stickyMessageInput" class="sticky-textarea" rows="2" placeholder="Write your experience, favorite dish, or fun moment from the event..."></textarea>
+          </div>
+
+          <div class="creator-action-row">
+            <span class="creator-hint">Press <strong>Pin Sticky Note</strong> to pin on the corkboard</span>
+            <button type="button" id="btnPinStickyNote" class="btn-pin-note">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              <span>Pin Sticky Note 📌</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- The Visual Corkboard Container -->
+        <div class="corkboard-canvas-frame" id="corkboardCanvasFrame">
+          <div class="corkboard-watermark" id="corkboardWatermark">Friday Dinner with Friends &middot; Memory Board</div>
+          <div id="stickyNotesGrid" class="sticky-notes-grid">
+            <!-- Pinned notes will be inserted here dynamically -->
+          </div>
+        </div>
+
+        <!-- Download Button Below the Sticky Note Board -->
+        <div class="board-bottom-download-wrap">
+          <button type="button" id="btnDownloadStickyBoardJpgBottom" class="btn-download-board-bottom">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>Download Memory Board as Image (JPG)</span>
+          </button>
+          <span class="board-download-caption">
+            Saves the entire corkboard with all pinned notes &amp; reviews as a high-resolution JPG image offline.
+          </span>
+        </div>
+      </section>
+    </div>
+
+    <!-- Reset Confirmation Modal -->
+    <div id="resetModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-box">
+        <h3 id="modalTitle" class="modal-title">Reset Bill Calculator?</h3>
+        <p class="modal-body">
+          This will clear the current occasion, host, bill amount, members, payment marks, sticky notes, and settlement state.
+        </p>
+        <div class="modal-actions">
+          <button type="button" id="btnCancelReset" class="btn-ghost">Cancel</button>
+          <button type="button" id="btnConfirmReset" class="btn-ghost" style="border-color: #ef4444; color: #f87171; background: rgba(239, 68, 68, 0.1);">
+            Yes, Reset
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notification Banner -->
+    <div id="toastNotice" class="toast-notice" role="status" aria-live="polite">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+      <span id="toastMessage">Action completed</span>
+    </div>
+
+    <!-- Vanilla Script -->
+    <script type="module" src="./script.js"></script>
+  </body>
+</html>
